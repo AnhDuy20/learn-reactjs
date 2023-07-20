@@ -23,6 +23,7 @@ function TodoFeature() {
   ];
 
   const [todoList, setTodoList] = useState(initTodoList);
+  const [filteredStatus, setFilteredStatus] = useState("all");
 
   // function obj: cập nhập status phần tử thứ index của mảng
   const handleTodoClick = (todo, index) => {
@@ -46,10 +47,32 @@ function TodoFeature() {
     setTodoList(newTodoList);
   };
 
+  const handleShowAllClick = () => {
+    setFilteredStatus("all");
+  };
+
+  const handleShowCompletedClick = () => {
+    setFilteredStatus("completed");
+  };
+
+  const handleShowNewClick = () => {
+    setFilteredStatus("new");
+  };
+
+  const renderedTodoList = todoList.filter(
+    (todo) => filteredStatus === "all" || filteredStatus === todo.status
+  );
+
   return (
     <div>
       <h3>Todo List</h3>
-      <TodoList todoList={todoList} onTodoClick={handleTodoClick} />
+      <TodoList todoList={renderedTodoList} onTodoClick={handleTodoClick} />
+
+      <div>
+        <button onClick={handleShowAllClick}>Show All</button>
+        <button onClick={handleShowCompletedClick}>Show Completed</button>
+        <button onClick={handleShowNewClick}>Show New</button>
+      </div>
     </div>
   );
 }
