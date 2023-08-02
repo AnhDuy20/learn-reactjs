@@ -1,28 +1,35 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import TodoList from "../compoments/TodoList";
 
 TodoFeature.propTypes = {};
+
+const FILTER_STATUS = {
+  NEW: "new",
+  COMPLETED: "completed",
+  ALL: "all",
+};
 
 function TodoFeature() {
   const initTodoList = [
     {
       id: 1,
       title: "Eat",
-      status: "new",
+      status: FILTER_STATUS.NEW,
     },
     {
       id: 2,
       title: "sleep",
-      status: "completed",
+      status: FILTER_STATUS.COMPLETED,
     },
     {
       id: 3,
       title: "code",
-      status: "new",
+      status: FILTER_STATUS.NEW,
     },
   ];
 
   const [todoList, setTodoList] = useState(initTodoList);
+  const [filteredStatus, setFilteredStatus] = useState(FILTER_STATUS.ALL);
 
   // function obj: cập nhập status phần tử thứ index của mảng
   const handleTodoClick = (todo, index) => {
@@ -36,7 +43,10 @@ function TodoFeature() {
       ...newTodoList[index],
 
       // cập nhập field status (được modified nên spread operator k copy)
-      status: newTodoList[index].status === "new" ? "completed" : "new",
+      status:
+        newTodoList[index].status === FILTER_STATUS.NEW
+          ? FILTER_STATUS.COMPLETED
+          : FILTER_STATUS.NEW,
     };
 
     // cập nhập new to do ở vị trí thứ index
@@ -46,10 +56,35 @@ function TodoFeature() {
     setTodoList(newTodoList);
   };
 
+  const handleShowAllClick = () => {
+    setFilteredStatus(FILTER_STATUS.ALL);
+  };
+
+  const handleShowCompletedClick = () => {
+    setFilteredStatus(FILTER_STATUS.COMPLETED);
+  };
+
+  const handleShowNewClick = () => {
+    setFilteredStatus(FILTER_STATUS.NEW);
+  };
+
+  const renderedTodoList = useMemo(() => {
+    return todoList.filter(
+      (todo) =>
+        filteredStatus === FILTER_STATUS.ALL || filteredStatus === todo.status
+    );
+  }, [todoList, filteredStatus]);
+
   return (
     <div>
       <h3>Todo List</h3>
-      <TodoList todoList={todoList} onTodoClick={handleTodoClick} />
+      <TodoList todoList={renderedTodoList} onTodoClick={handleTodoClick} />
+
+      <div>
+        <button onClick={handleShowAllClick}>Show All</button>
+        <button onClick={handleShowCompletedClick}>Show Completed</button>
+        <button onClick={handleShowNewClick}>Show New</button>
+      </div>
     </div>
   );
 }
